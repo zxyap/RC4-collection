@@ -1,12 +1,14 @@
-import pyshark as ps
+import scapy.all as sc
 import sys
 
-outputpath = "./captures"
-
 def capture():
-	print("capturing at address " + ip_addr + " into capture" + fileNumber + "-" + fileSubNumber + ".pcap....")
-	capture = ps.LiveCapture(interface = "eth0", output_file = outputpath + "/capture" + fileNumber + "-" + fileSubNumber + ".pcap", display_filter = 'ip.dst==' + ip_addr)
-	capture.sniff(timeout = timeout)
+	full_file_name = "./captures/capture" + fileNumber + '-' + fileSubNumber
+	print('capturing at ' + ip_addr + ' into ' + full_file_name + "...")
+	packets = sc.sniff(iface = 'eth0', filter = 'host ' + ip_addr, timeout=timeout)
+	if(len(packets) == 0):
+		print('no packets captured, not saving to pcap file.')
+	else:
+		sc.wrpcap(full_file_name, packets)
 
 if __name__ == "__main__" :
 	ip_addr = sys.argv[1]
